@@ -32,7 +32,7 @@ Característica: Landing de Liverpool
     Cuando el cliente da clic en "Iniciar sesión" del banner personalizado
     Entonces se presenta el formulario de autenticación
 
-  @inicio-sesion @qa
+    @inicio-sesion @qa
   Escenario: Inicio de sesión con credenciales del ambiente QA
     Cuando el cliente da clic en "Iniciar sesión" del banner personalizado
     Y inicia sesión con las credenciales del ambiente "qa"
