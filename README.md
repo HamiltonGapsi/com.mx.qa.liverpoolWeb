@@ -103,6 +103,20 @@ Indicadores recomendados a revisar:
 .\gradlew.bat clean testProd
 ```
 
+### Flujo Landing (`LandingFlujoTestRunner`)
+
+Escenarios en `src/test/resources/features/landing/landing.feature`:
+
+- `@busqueda-global`: búsqueda de "iPhone" en la barra superior y validación de la PLP.
+- `@navegacion-menu`: menú Categorías > Mujer > Bolsas > Tote.
+- `@acceso-login`: clic en "Iniciar sesión" y validación del formulario de autenticación.
+- `@inicio-sesion`: login con credenciales de `environments.qa` (serenity.conf); pasa cuando, tras enviar el formulario, se carga otra vista (p. ej. la validación de código).
+
+```powershell
+.\gradlew.bat clean test --tests "com.liverpool.qa.web.runners.functional.LandingFlujoTestRunner"
+.\gradlew.bat clean test --tests "com.liverpool.qa.web.runners.functional.LandingFlujoTestRunner" -Ptags="@acceso-login"
+```
+
 ## 10) Nota para mapeo XPath/CSS
 
 Se dejaron metodos base en:

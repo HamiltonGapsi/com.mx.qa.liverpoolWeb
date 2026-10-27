@@ -1,0 +1,98 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "net.serenity-bdd:serenity-gradle-plugin:4.2.34"
+        classpath "net.serenity-bdd:serenity-single-page-report:4.2.34"
+    }
+}
+
+plugins {
+    id "java"
+    id "idea"
+}
+
+apply plugin: "net.serenity-bdd.serenity-gradle-plugin"
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+ext {
+    serenityVersion = '4.2.34'
+}
+
+dependencies {
+    implementation "org.slf4j:slf4j-reload4j:2.0.7"
+    implementation "org.apache.logging.log4j:log4j-core:2.20.0"
+    implementation "org.antlr:ST4:4.3.4"
+
+    implementation "net.serenity-bdd:serenity-core:${serenityVersion}"
+    implementation "net.serenity-bdd:serenity-cucumber:${serenityVersion}"
+    implementation "net.serenity-bdd:serenity-screenplay:${serenityVersion}"
+    implementation "net.serenity-bdd:serenity-screenplay-webdriver:${serenityVersion}"
+    implementation "net.serenity-bdd:serenity-screenplay-rest:${serenityVersion}"
+    implementation "net.serenity-bdd:serenity-ensure:${serenityVersion}"
+
+    implementation "io.cucumber:cucumber-java:7.15.0"
+    testImplementation "io.cucumber:cucumber-junit:7.15.0"
+    implementation "io.cucumber:gherkin:27.0.0"
+
+    // JavaFaker para generar datos aleatorios
+    implementation "com.github.javafaker:javafaker:1.0.2"
+}
+
+tasks.register('backupFeatures') {
+    dependsOn(clean)
+    doLast {
+        copy {
+            from "src/test/resources/features"
+            into "build/originalFeatures"
+        }
+    }
+}
+
+tasks.register('restoreFeatures') {
+    doLast {
+        copy {
+            from "build/originalFeatures"
+            into "src/test/resources/features"
+        }
+        delete "build/originalFeatures"
+
+        copy {
+            from "src/test/resources/assets"
+            into "target/site/serenity/assets"
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+compileJava.dependsOn(backupFeatures)
+
+serenity {
+    requirementsDir = "src/test/resources/features"
+    reports = ["single-page-html"]
+}
+
+gradle.startParameter.continueOnFailure = true
+
+test {
+    // Permite pasar el tag desde consola: .\gradlew test -Ptags="@ariba"
+    if (project.hasProperty('tags')) {
+        systemProperty 'cucumber.filter.tags', project.property('tags')
+    }
+    finalizedBy(aggregate, restoreFeatures)
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
