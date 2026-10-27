@@ -2,11 +2,20 @@
 @pdp @dev @qa @prod
 Característica: Product Detail Page
   Como cliente digital
-  Quiero abrir la tienda web
-  Para realizar el flujo completo de compra desde un producto destacado
+  Quiero elegir un producto desde los resultados de búsqueda
+  Para agregarlo a mi bolsa y continuar con la compra
 
-  @pdp-regression
-  Escenario: Preparar add to cart con SKU externo
-    Dado que el cliente abre un PDP con datos externos
-    Cuando solicita agregar el producto al carrito
-    Entonces se conserva el SKU objetivo para mapear el flujo real
+  @pdp-regression @agregar-carrito
+  Esquema del escenario: Agregar a la bolsa un producto seleccionado desde la búsqueda
+    Dado que el cliente busca "<termino>" desde la landing de Liverpool
+    Cuando selecciona el primer producto de la lista de resultados
+    Entonces se muestra el detalle del producto seleccionado
+    Cuando elige la primera talla disponible
+    Y agrega el producto a su bolsa
+    Y abre su bolsa de compras desde el header
+    Entonces su bolsa contiene al menos un producto
+    Y puede continuar con la compra
+
+    Ejemplos:
+      | termino |
+      | playera |

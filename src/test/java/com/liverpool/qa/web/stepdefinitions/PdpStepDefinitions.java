@@ -1,9 +1,15 @@
 package com.liverpool.qa.web.stepdefinitions;
 
 import com.liverpool.qa.screenplay.actors.UsuarioWeb;
-import com.liverpool.qa.screenplay.questions.CurrentUrlContains;
-import com.liverpool.qa.screenplay.tasks.pdp.AbrirPdpPorSku;
-import com.liverpool.qa.screenplay.tasks.pdp.SolicitarAgregarCarrito;
+import com.liverpool.qa.screenplay.questions.TextoContiene;
+import com.liverpool.qa.screenplay.tasks.landing.AbrirLanding;
+import com.liverpool.qa.screenplay.tasks.landing.BuscarProducto;
+import com.liverpool.qa.screenplay.tasks.pdp.AbrirCarrito;
+import com.liverpool.qa.screenplay.tasks.pdp.AgregarAlCarrito;
+import com.liverpool.qa.screenplay.tasks.pdp.SeleccionarTalla;
+import com.liverpool.qa.screenplay.tasks.pdp.ValidarBolsa;
+import com.liverpool.qa.screenplay.tasks.plp.SeleccionarPrimerProducto;
+import com.liverpool.qa.screenplay.ui.PdpPage;
 import io.cucumber.java.Before;
 import io.cucumber.java.es.Cuando;
 import io.cucumber.java.es.Dado;
@@ -11,9 +17,16 @@ import io.cucumber.java.es.Entonces;
 import net.serenitybdd.annotations.Managed;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.ensure.Ensure;
+import net.serenitybdd.screenplay.waits.WaitUntil;
 import org.openqa.selenium.WebDriver;
 
+import java.time.Duration;
+
+import static net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible;
+
 public class PdpStepDefinitions {
+
+    private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
     @Managed
     private WebDriver driver;
@@ -25,37 +38,55 @@ public class PdpStepDefinitions {
         shopper = UsuarioWeb.llamado("Shopper Web", driver);
     }
 
-    @Dado("que el cliente abre un PDP con datos externos")
-    public void queElClienteAbreUnPdpConDatosExternos() {
-        // Leemos el dato externo y lo guardamos
-        String skuExterno = System.getProperty("sku", "123456");
-        shopper.remember("pdpSku", skuExterno);
-
-        // El actor abre la URL
-        shopper.attemptsTo(AbrirPdpPorSku.conSku(skuExterno));
+    @Dado("que el cliente busca {string} desde la landing de Liverpool")
+    public void queElClienteBuscaDesdeLaLandingDeLiverpool(String termino) {
+        shopper.attemptsTo(
+                AbrirLanding.principal(),
+                BuscarProducto.conTermino(termino)
+        );
     }
 
-    @Cuando("solicita agregar el producto al carrito")
-    public void solicitaAgregarElProductoAlCarrito() {
-        // El actor recupera el SKU de su memoria
-        String sku = shopper.recall("pdpSku");
-
-        // Ejecuta la Tarea que mapeamos (Clic en carrusel, agregar, ir a carrito, comprar)
-        shopper.attemptsTo(SolicitarAgregarCarrito.deSku(sku));
+    @Cuando("selecciona el primer producto de la lista de resultados")
+    public void seleccionaElPrimerProductoDeLaListaDeResultados() {
+        shopper.attemptsTo(SeleccionarPrimerProducto.deLaLista());
     }
 
-    @Entonces("se conserva el SKU objetivo para mapear el flujo real")
-    public void seConservaElSkuObjetivoParaMapearElFlujoReal() {
-        String sku = shopper.recall("pdpSku");
-        String requestedSku = shopper.recall("skuAddToCartRequested");
+    @Entonces("se muestra el detalle del producto seleccionado")
+    public void seMuestraElDetalleDelProductoSeleccionado() {
+        String producto = shopper.recall(SeleccionarPrimerProducto.PRODUCTO_SELECCIONADO);
+        shopper.attemptsTo(
+                WaitUntil.the(PdpPage.TITULO_PRODUCTO, isVisible()).forNoMoreThan(TIMEOUT),
+                Ensure.thatTheAnswerTo("el título del PDP corresponde al producto seleccionado",
+                        TextoContiene.en(PdpPage.TITULO_PRODUCTO, producto)).isTrue(),
+                Ensure.that(PdpPage.BOTON_AGREGAR_CARRITO).isDisplayed()
+        );
+    }
 
-        // 1. Validamos que el SKU solicitado se haya registrado en la memoria del actor
-        if (sku != null) {
-            shopper.attemptsTo(Ensure.that(requestedSku).isEqualTo(sku));
-        } else {
-            // Si el flujo vino del carrusel (sin SKU explicito), aseguramos que requestedSku tenga un valor
-            shopper.attemptsTo(Ensure.that(requestedSku).isNotNull());
-        }
+    @Cuando("elige la primera talla disponible")
+    public void eligeLaPrimeraTallaDisponible() {
+        shopper.attemptsTo(SeleccionarTalla.primeraDisponible());
+    }
 
+    @Cuando("agrega el producto a su bolsa")
+    public void agregaElProductoASuBolsa() {
+        shopper.attemptsTo(AgregarAlCarrito.elProducto());
+    }
+
+    @Cuando("abre su bolsa de compras desde el header")
+    public void abreSuBolsaDeComprasDesdeElHeader() {
+        shopper.attemptsTo(AbrirCarrito.desdeElHeader());
+    }
+
+    @Entonces("su bolsa contiene al menos un producto")
+    public void suBolsaContieneAlMenosUnProducto() {
+        shopper.attemptsTo(ValidarBolsa.conProductos());
+    }
+
+    @Entonces("puede continuar con la compra")
+    public void puedeContinuarConLaCompra() {
+        shopper.attemptsTo(
+                WaitUntil.the(PdpPage.BOTON_COMPRAR_AHORA, isVisible()).forNoMoreThan(TIMEOUT),
+                Ensure.that(PdpPage.BOTON_COMPRAR_AHORA).isEnabled()
+        );
     }
 }

@@ -117,6 +117,14 @@ Escenarios en `src/test/resources/features/landing/landing.feature`:
 .\gradlew.bat clean test --tests "com.liverpool.qa.web.runners.functional.LandingFlujoTestRunner" -Ptags="@acceso-login"
 ```
 
+### Flujo PDP (`PdpTestSuite`)
+
+`src/test/resources/features/pdp/pdp.feature` (`@agregar-carrito`): busca un término en la landing, selecciona el primer producto de la PLP, valida el PDP, elige la primera talla disponible (si aplica), agrega a la bolsa y espera la actualización de su contador. Al abrir la bolsa, `ValidarBolsa.conProductos()` comprueba que existe al menos un artículo visible, sin depender de su nombre completo. Finalmente valida que el botón "Comprar" está habilitado. Esta comprobación no valida la identidad del artículo en la bolsa.
+
+```powershell
+.\gradlew.bat clean test --tests "com.liverpool.qa.web.runners.functional.PdpTestSuite"
+```
+
 ## 10) Nota para mapeo XPath/CSS
 
 Se dejaron metodos base en:
@@ -126,4 +134,3 @@ Se dejaron metodos base en:
 - `src/main/java/com/liverpool/qa/screenplay/ui/PdpPage.java`
 
 En esos metodos se realiza el mapeo de localizadores reales de la nueva tienda.
-

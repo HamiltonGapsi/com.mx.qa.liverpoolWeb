@@ -23,6 +23,9 @@ public final class PlpPage {
                 .of(testId);
     }
 
+    public static final Target NOMBRE_PRIMER_PRODUCTO = Target.the("nombre del primer producto del catálogo")
+            .locatedBy("(//*[@id='plp-page-card-product-list']/a//h3)[1]");
+
 
 
 }
