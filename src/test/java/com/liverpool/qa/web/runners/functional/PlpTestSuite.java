@@ -6,11 +6,11 @@ import org.junit.runner.RunWith;
 
 @RunWith(CucumberSerenityRunner.class)
 @CucumberOptions(
-        features = "src/test/resources/features",
+        features = "src/test/resources/features/plp",
         glue = "com.liverpool.qa.web",
         tags = "@plp and not @wip",
-        plugin = {"pretty"}
+        plugin = {"pretty"},
+        snippets = CucumberOptions.SnippetType.CAMELCASE
 )
 public class PlpTestSuite {
 }
-

@@ -103,7 +103,7 @@ Indicadores recomendados a revisar:
 .\gradlew.bat clean testProd
 ```
 
-### Flujo Landing (`LandingFlujoTestRunner`)
+### Flujo Landing (`LandingTestSuite`)
 
 Escenarios en `src/test/resources/features/landing/landing.feature`:
 
@@ -113,8 +113,8 @@ Escenarios en `src/test/resources/features/landing/landing.feature`:
 - `@inicio-sesion`: login con credenciales de `environments.qa` (serenity.conf); pasa cuando, tras enviar el formulario, se carga otra vista (p. ej. la validación de código).
 
 ```powershell
-.\gradlew.bat clean test --tests "com.liverpool.qa.web.runners.functional.LandingFlujoTestRunner"
-.\gradlew.bat clean test --tests "com.liverpool.qa.web.runners.functional.LandingFlujoTestRunner" -Ptags="@acceso-login"
+.\gradlew.bat clean test --tests "com.liverpool.qa.web.runners.functional.LandingTestSuite"
+.\gradlew.bat clean test --tests "com.liverpool.qa.web.runners.functional.LandingTestSuite" -Ptags="@acceso-login"
 ```
 
 ### Flujo PDP (`PdpTestSuite`)
@@ -123,6 +123,20 @@ Escenarios en `src/test/resources/features/landing/landing.feature`:
 
 ```powershell
 .\gradlew.bat clean test --tests "com.liverpool.qa.web.runners.functional.PdpTestSuite"
+```
+
+### Flujo PLP (`PlpTestSuite`)
+
+`src/test/resources/features/plp/plp.feature` incluye dos escenarios independientes:
+
+- `@plp-resultados`: busca desde la barra de la landing y valida el termino en la URL, la grilla visible y un primer producto con nombre.
+- `@plp-seleccion`: consulta el catalogo, selecciona el primer articulo y verifica que el titulo de su PDP corresponde al producto elegido.
+
+La validacion de resultados se reutiliza mediante `ValidarResultados.para(termino)`. No se agrega al carrito ni se inicia checkout.
+
+```powershell
+.\gradlew.bat test --tests "com.liverpool.qa.web.runners.functional.PlpTestSuite"
+.\gradlew.bat test --tests "com.liverpool.qa.web.runners.functional.PlpTestSuite" -Ptags="@plp-seleccion"
 ```
 
 ## 10) Nota para mapeo XPath/CSS

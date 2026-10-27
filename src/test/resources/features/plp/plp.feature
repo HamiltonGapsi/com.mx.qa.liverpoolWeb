@@ -2,12 +2,24 @@
 @plp @dev @qa @prod
 Característica: Product Listing Page
   Como cliente digital
-  Quiero navegar a la PLP
+  Quiero buscar y seleccionar productos en el catalogo
   Para validar el descubrimiento de productos
 
-  @plp-regression
-  Escenario: Validar URL de PLP con datos externos
-    Dado que el cliente abre una PLP usando datos externos
-    Cuando navega a la lista de productos
-    Entonces la URL contiene el criterio de búsqueda
+  Antecedentes:
+    Dado que el cliente esta en la landing para explorar el catalogo
 
+  @plp-regression @plp-resultados
+  Esquema del escenario: Consultar productos desde la busqueda global
+    Cuando busca "<termino>" para consultar el catalogo
+    Entonces la PLP muestra productos para la busqueda realizada
+
+    Ejemplos:
+      | termino |
+      | iPhone  |
+
+  @plp-regression @plp-seleccion
+  Escenario: Abrir el detalle de un producto desde la PLP
+    Cuando busca "playera" para consultar el catalogo
+    Entonces la PLP muestra productos para la busqueda realizada
+    Cuando abre el primer articulo del catalogo
+    Entonces accede al detalle del articulo elegido desde la PLP
